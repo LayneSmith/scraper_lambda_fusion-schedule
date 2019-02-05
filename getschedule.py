@@ -6,9 +6,9 @@ from bs4 import BeautifulSoup
 def scrapeSchedule():
     """Scrapes schedule from team pages."""
 
-    payload_array = [['day', 'date', 'year', 'time', 'home', 'home_score', 'away', 'away_score', 'field']]
+    payload_array = [['day', 'date', 'year', 'time', 'home', 'homeID', 'home_score', 'away', 'awayID', 'away_score', 'field']]
 
-    # GET SCHOOLS LIST
+    # GET TEAMS LIST
     url = 'http://events.gotsport.com/events/schedule.aspx?eventid=67315&FieldID=0&applicationID=4788436&action=Go'
     #requests
     url_r = requests.get(url)
@@ -32,13 +32,16 @@ def scrapeSchedule():
             home_team = game_rows[2].find('td', {'class': 'homeTeam'}).text
             away_team = game_rows[2].find('td', {'class': 'awayTeam'}).text
 
+            home_id = game_rows[2].find('td', {'class': 'homeTeam'}).find('a')['href'].split("applicationID=")[1].split("&")[0]
+            away_id = game_rows[2].find('td', {'class': 'awayTeam'}).find('a')['href'].split("applicationID=")[1].split("&")[0]
+
             scores = game_rows[2].findAll('span', {'class': 'score'})
             home_score = scores[0].text
             away_score = scores[1].text
 
             field = game_rows[2].find('td', {'class': 'location'}).findAll('div')[0].text
 
-            payload_array.append([game_day, game_date, game_year, game_time, home_team, home_score, away_team, away_score, field])
+            payload_array.append([game_day, game_date, game_year, game_time, home_team, home_id, home_score, away_team, away_id, away_score, field])
     
         si = StringIO()
         cw = csv.writer(si)
